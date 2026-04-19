@@ -1,44 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PokeDex</title>
   </head>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <body>
-    <div class="min-screen h-screen bg-blue-100">
-        <div class="text-center text-3xl font-serif bg-red-500 p-2">PokeDex</div>
+  <body class="flex flex-col bg-gray-800">
+    <div>
+        <div class="text-center text-3xl font-serif bg-yellow-600  p-2">PokeDex</div>
         <div class="text-center">
-            <button class="w-200 bg-red-300 p-2 rounded-lg m-2" onclick="addCard()">Add Card</button>
+            <button class="w-200 font-serif p-2 rounded-lg m-2" onclick="createCard()">
+              Add Card
+            </button>
         </div>
-        
-        <div class="flex flex-row m-4">
+        <div id="display-card" class="flex flex-col justify-center items-center">
+            <div id="card-container" class="flex flex-wrap justify-center">
+              
+            </div>
             
-            <form>
-                <div class="flex flex-col border-2 w-100 m-5" id="card">
-                    <div class="flex flex-col text-center rounded-lg border-2 p-5 m-3 h-60">
-                        <img src="Bruh">
-                    </div>
-                   
-                    <div class="text-start m-2">ID:</div>
-                    <div class="text-start m-2">Health:</div>
-                    <div class="text-start m-2">Type:</div>
-                <div class="text-start m-2">Description:</div>
-                <button class="bg-pink-600 rounded-lg p-2 text-center m-2" onclick="updateCard()">Update Card</button>
-            </form>
         </div>
-        <!-- <div class="flex flex-col border-2 w-100 m-5">
-            <div class="flex flex-col text-center border-2 p-5 m-3 h-60">Image</div>
-            <div class="text-start bg-yellow-400 m-2">ID:</div>
-            <div class="text-start bg-yellow-400 m-2">Health:</div>
-            <div class="text-start bg-yellow-400 m-2">Type:</div>
-            <div class="text-start bg-yellow-400 m-2">Description:</div>
-        </div> -->
-    </div>
-</div>
-   
-    
-    </body>
-  <script src="app.js"></script>
+    </div>   
+    <script src="app.js"></script>
+  </body>
 </html>
