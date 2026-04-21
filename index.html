@@ -9,18 +9,14 @@
   <body class="flex flex-col bg-gray-800">
     <div>
         <div class="text-center text-3xl font-serif bg-yellow-600  p-2">PokeDex</div>
-        <div class="text-center">
-            <button class="w-200 font-serif p-2 rounded-lg m-2" onclick="createCard()">
+        <div class="flex align-center justify-center">
+            <button id="open-form" class="w-200 font-serif p-2 rounded-lg m-2 bg-yellow-500">
               Add Card
             </button>
         </div>
-        <div id="display-card" class="flex flex-col justify-center items-center">
-            <div id="card-container" class="flex flex-wrap justify-center">
-              
-            </div>
-            
-        </div>
-    </div>   
+        <div id="display-card" class=" flex align-center justify-center">
+      <div id="card-container" class="flex flex-wrap justify-center gap-2"></div>
+    </div> 
     <script src="app.js"></script>
   </body>
 </html>

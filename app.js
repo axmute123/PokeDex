@@ -1,4 +1,6 @@
 let pokemonData = JSON.parse(localStorage.getItem("pokemonData")) || [];
+// console.log("data:", pokemonData);
+let editId = null;
 
 const getNextId = () => {
   let currentId = Number(localStorage.getItem("pokemonIdCounter")) || 0;
@@ -7,92 +9,141 @@ const getNextId = () => {
   return currentId;
 };
 
-const createCard = () => {
+document.getElementById("open-form").addEventListener("click", () => {
+  editId = null;
+  createCard();
+});
+
+const createCard = (pokemon = null) => {
   const data = `
     <div class="flex flex-col border-2 w-96 m-5 bg-yellow-100 p-3">
-      <input id="poke-image" type="text" placeholder="Image URL" class="border p-2 mb-2">
+      <label>PokeDexNumber</label>
+      <input id="poke-id" type="number"  value="${pokemon ? pokemon.pokeid : ""}" placeholder="No." class="border p-2 mb-2">
 
       <label>Name:</label>
-      <input id="poke-name" type="text" placeholder="Name" class="border p-2 mb-2">
-
-      <label>Health:</label>
-      <input id="poke-health" type="number" placeholder="Health" class="border p-2 mb-2">
+      <input id="poke-name" type="text" value="${pokemon ? pokemon.pokeName : ""}" placeholder="Name" class="border p-2 mb-2">
 
       <label>Type:</label>
-      <input id="poke-type" type="text" placeholder="Type" class="border p-2 mb-2">
+      <input id="poke-type" type="text" value="${pokemon ? pokemon.pokeType : ""}" placeholder="Type" class="border p-2 mb-2">
 
-      <label>Description:</label>
-      <input id="poke-desc" type="text" placeholder="Description" class="border p-2 mb-2">
+      <button id="save-btn" class="bg-green-500 text-white p-2 mt-2">
+        ${pokemon ? "Update" : "Save"}
+      </button>
 
-      <button class="bg-green-500 text-white p-2 mt-2" onclick="saveCard()">Save</button>
+
+      <button id="close-btn" class="bg-red-500 text-white p-2 mt-2">
+        Close
+      </button>
     </div>
   `;
+  const display = document.getElementById("display-card");
+  display.innerHTML = data;
+  // display.style.display = "flex";
 
-  document.getElementById("display-card").innerHTML = data;
-  displayCard();
+  document.getElementById("save-btn").addEventListener("click", saveCard);
+  document.getElementById("close-btn").addEventListener("click", closeForm);
 };
 
 
 const saveCard = () => {
-  const pokeName = document.getElementById("poke-name").value
-  const pokeHealth = document.getElementById("poke-health").value
-  const pokeType = document.getElementById("poke-type").value
-  const pokeDesc = document.getElementById("poke-desc").value
 
+  const pokeid = document.getElementById("poke-id")?.value;
+  const pokeName = document.getElementById("poke-name")?.value;
+  const pokeType = document.getElementById("poke-type")?.value;
 
-  const newPokemon = {
-    id: getNextId(),
-    image: null, 
-    pokeName: pokeName,
-    pokeHealth: pokeHealth,
-    pokeType: pokeType,
-    pokeDesc: pokeDesc,
+  if (editId !== null) {
+    const index = pokemonData.findIndex((p) => p.id === editId);
+
+    if (index !== -1) {
+      pokemonData[index] = {
+        ...pokemonData[index],
+        pokeid,
+        pokeName,
+        pokeType,
+      };
+    }
+
+    editId = null;
+  } else {
+    pokemonData.push({
+      id: getNextId(),
+      pokeid,
+      pokeName,
+      pokeType,
+    });
   }
-  console.log(newPokemon);
-  pokemonData.push(newPokemon);
+
   localStorage.setItem("pokemonData", JSON.stringify(pokemonData));
-  pokemonData = JSON.parse(localStorage.getItem("pokemonData"));
+  console.log(pokemonData);
+
+  closeForm();
+
   displayCard();
-  // document.getElementById("display-card").style.display = "none";
-  // document.getElementById("card-container").style.display = "block";
 };
+
 
 const displayCard = () => {
   const container = document.getElementById("card-container");
+  console.log("data:", pokemonData);
 
-  
   if (!container) return;
 
   container.innerHTML = "";
 
-  pokemonData.forEach(pokemon => {
-    const card = `
-      <div class="border-2 p-3 m-3 w-60 bg-yellow-200">
-        ${pokemon.image ? `<img src="${pokemon.image}" class="h-32 w-full object-cover mb-2">` : ""}
-        <p><strong>Name: ${pokemon.pokeName}</strong></p>
-        <p>Health: ${pokemon.pokeHealth}</p>
-        <p>Type: ${pokemon.pokeType}</p>
-        <p>Description: ${pokemon.pokeDesc}</p>
-        <button onclick="deleteCard(${pokemon.id})" class="bg-red-500 text-white px-2 mt-2">Delete</button>
-      </div>
-    `;
-    container.innerHTML += card;
+  pokemonData.forEach((pokemon) => {
+    container.innerHTML += `
+    <div class="bg-yellow-500 w-full p-1">
+    <p>No: ${pokemon.pokeid}</p>
+    <p>Name: ${pokemon.pokeName}</p>
+    <p>Type: ${pokemon.pokeType}</p>
+    <button onclick="updateCard(${pokemon.id})" class="bg-green-700 text-white p-1 mt-1">
+    Update
+        </button>
+
+        <button onclick="deleteCard(${pokemon.id})" class="bg-red-700 text-white p-1 mt-1">
+        Delete
+        </button>
+        </div>
+
+        
+        `;
   });
+  
+
 };
 
+
 const updateCard = (id) => {
+  id = Number(id);
 
-}
+  const pokemon = pokemonData.find((p) => p.id === id);
+  if (!pokemon) return;
 
+  editId = id;
+  createCard(pokemon);
+};
 
 const deleteCard = (id) => {
-  pokemonData = pokemonData.filter(pokemon => pokemon.id !== id);
+  pokemonData = pokemonData.filter((pokemon) => pokemon.id !== id);
 
   localStorage.setItem("pokemonData", JSON.stringify(pokemonData));
+  displayCard();
+};
 
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("update-btn")) {
+    updateCard(Number(e.target.dataset.id));
+  }
+  if (e.target.classList.contains("delete-btn")) {
+    deleteCard(Number(e.target.dataset.id));
+  }
+});
+
+const closeForm = () => {
+  const display = document.getElementById("display-card");
+  display.style.display = "none";
+  // display.innerHTML = "";
   displayCard();
 };
 
 displayCard();
-
-
