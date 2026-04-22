@@ -4,19 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PokeDex</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <body class="flex flex-col bg-gray-800">
-    <div>
-        <div class="text-center text-3xl font-serif bg-yellow-600  p-2">PokeDex</div>
-        <div class="flex align-center justify-center">
-            <button id="open-form" class="w-200 font-serif p-2 rounded-lg m-2 bg-yellow-500">
-              Add Card
-            </button>
-        </div>
-        <div id="display-card" class=" flex align-center justify-center">
-      <div id="card-container" class="flex flex-wrap justify-center gap-2"></div>
-    </div> 
+  <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center">
+    <header class="w-full bg-red-600 shadow-lg">
+      <div class="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+        <h1 class="text-2xl font-bold tracking-wide">Pokédex</h1>
+        <button id="open-form" class="bg-white text-red-600 px-4 py-2 rounded-full font-semibold hover:bg-gray-200 transition">
+          Add
+        </button>
+      </div>
+    </header>
+    <main class="w-full max-w-5xl px-4 py-6">
+      <div id="form-container" class="flex justify-center mb-6"></div>
+      <div id="display-card" class="flex justify-center">
+        <div id="card-container" class="flex flex-wrap justify-center gap-4 w-full"></div>
+      </div>
+
+    </main>
+
     <script src="app.js"></script>
   </body>
 </html>

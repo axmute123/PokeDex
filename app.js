@@ -1,55 +1,114 @@
-let pokemonData = JSON.parse(localStorage.getItem("pokemonData")) || [];
-// console.log("data:", pokemonData);
+const pokemonData = JSON.parse(localStorage.getItem("pokemonData")) || [];
 let editId = null;
 
-const getNextId = () => {
-  let currentId = Number(localStorage.getItem("pokemonIdCounter")) || 0;
-  currentId++;
-  localStorage.setItem("pokemonIdCounter", currentId);
-  return currentId;
+const formContainer = document.querySelector("#form-container");
+const container = document.querySelector("#card-container");
+const openBtn = document.querySelector("#open-form");
+
+const getTypeColor = (type) => {
+  const t = type.toLowerCase();
+
+  switch (t) {
+    case "grass":
+      return "bg-green-500";
+    case "fire":
+      return "bg-red-500";
+    case "water":
+      return "bg-blue-500";
+    case "electric":
+      return "bg-yellow-400 text-black";
+    case "poison":
+      return "bg-purple-500";
+    case "normal":
+      return "bg-gray-400 text-black";
+    case "flying":
+      return "bg-sky-400";
+    case "bug":
+      return "bg-lime-500";
+    case "rock":
+      return "bg-yellow-700";
+    case "ground":
+      return "bg-amber-600";
+    case "psychic":
+      return "bg-pink-500";
+    case "ice":
+      return "bg-cyan-300 text-black";
+    case "dragon":
+      return "bg-indigo-600";
+    case "dark":
+      return "bg-gray-900";
+    case "fairy":
+      return "bg-pink-300 text-black";
+    default:
+      return "bg-gray-600";
+  }
 };
 
-document.getElementById("open-form").addEventListener("click", () => {
+const getNextId = () => {
+  let id = Number(localStorage.getItem("pokemonIdCounter")) || 0;
+  id++;
+  localStorage.setItem("pokemonIdCounter", id);
+  return id;
+};
+
+openBtn.addEventListener("click", () => {
   editId = null;
-  createCard();
+  pokemonForm();
 });
 
-const createCard = (pokemon = null) => {
-  const data = `
-    <div class="flex flex-col border-2 w-96 m-5 bg-yellow-100 p-3">
-      <label>PokeDexNumber</label>
-      <input id="poke-id" type="number"  value="${pokemon ? pokemon.pokeid : ""}" placeholder="No." class="border p-2 mb-2">
+const pokemonForm = (pokemon = {}) => {
+  formContainer.innerHTML = `
+    <div class="bg-gray-800 text-white rounded-xl p-6 w-80 shadow">
 
-      <label>Name:</label>
-      <input id="poke-name" type="text" value="${pokemon ? pokemon.pokeName : ""}" placeholder="Name" class="border p-2 mb-2">
+      <input id="poke-id" type="number"
+        value="${pokemon.pokeid || ""}"
+        placeholder="Dex No."
+        class="w-full p-2 mb-2 rounded bg-gray-700">
 
-      <label>Type:</label>
-      <input id="poke-type" type="text" value="${pokemon ? pokemon.pokeType : ""}" placeholder="Type" class="border p-2 mb-2">
+      <input id="poke-name" type="text"
+        value="${pokemon.pokeName || ""}"
+        placeholder="Name"
+        class="w-full p-2 mb-2 rounded bg-gray-700">
 
-      <button id="save-btn" class="bg-green-500 text-white p-2 mt-2">
-        ${pokemon ? "Update" : "Save"}
+      <input id="poke-type" type="text"
+        value="${pokemon.pokeType ? pokemon.pokeType.join(", ") : ""}"
+        placeholder="grass, poison"
+        class="w-full p-2 mb-3 rounded bg-gray-700">
+
+      <button id="save-btn" class="bg-green-500 w-full p-2 rounded mb-2">
+        ${editId ? "Update" : "Save"}
       </button>
 
-
-      <button id="close-btn" class="bg-red-500 text-white p-2 mt-2">
+      <button id="close-btn" class="bg-red-500 w-full p-2 rounded">
         Close
       </button>
     </div>
   `;
-  const display = document.getElementById("display-card");
-  display.innerHTML = data;
-  // display.style.display = "flex";
 
-  document.getElementById("save-btn").addEventListener("click", saveCard);
-  document.getElementById("close-btn").addEventListener("click", closeForm);
+  document.querySelector("#save-btn").addEventListener("click", saveCard);
+  document.querySelector("#close-btn").addEventListener("click", closeForm);
 };
 
-
 const saveCard = () => {
+  const pokeid = document.querySelector("#poke-id").value;
+  const pokeName = document.querySelector("#poke-name").value;
 
-  const pokeid = document.getElementById("poke-id")?.value;
-  const pokeName = document.getElementById("poke-name")?.value;
-  const pokeType = document.getElementById("poke-type")?.value;
+  const pokeType = document
+    .querySelector("#poke-type")
+    .value.split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+
+  const existing = pokemonData.find(
+    (p) => Number(p.pokeid) === Number(pokeid) && p.id !== editId,
+  );
+
+  if (existing) {
+    alert("Pokédex number already exists!");
+    return;
+  }
+
+  if (!pokeid || !pokeName || pokeType.length === 0) return;
 
   if (editId !== null) {
     const index = pokemonData.findIndex((p) => p.id === editId);
@@ -57,7 +116,7 @@ const saveCard = () => {
     if (index !== -1) {
       pokemonData[index] = {
         ...pokemonData[index],
-        pokeid,
+        pokeid: Number(pokeid),
         pokeName,
         pokeType,
       };
@@ -67,83 +126,87 @@ const saveCard = () => {
   } else {
     pokemonData.push({
       id: getNextId(),
-      pokeid,
+      pokeid: Number(pokeid),
       pokeName,
       pokeType,
     });
   }
 
   localStorage.setItem("pokemonData", JSON.stringify(pokemonData));
-  console.log(pokemonData);
 
   closeForm();
-
-  displayCard();
+  renderCards();
 };
 
+const renderCards = () => {
+  container.innerHTML = pokemonData
+    .map(
+      (pokemon) => `
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-4 shadow w-40">
 
-const displayCard = () => {
-  const container = document.getElementById("card-container");
-  console.log("data:", pokemonData);
+      <p class="text-sm text-gray-400">#${pokemon.pokeid}</p>
 
-  if (!container) return;
+      <h3 class="font-bold capitalize">${pokemon.pokeName}</h3>
 
-  container.innerHTML = "";
+      <div class="flex gap-1 flex-wrap mt-2">
+        ${(Array.isArray(pokemon.pokeType) ?
+          pokemon.pokeType
+        : [pokemon.pokeType]
+        )
+          .filter(Boolean)
+          .map(
+            (type) => `
+    <span class="text-xs px-2 py-1 rounded ${getTypeColor(type)}">
+      ${type}
+    </span>
+  `,
+          )
+          .join("")}
+      </div>
 
-  pokemonData.forEach((pokemon) => {
-    container.innerHTML += `
-    <div class="bg-yellow-500 w-full p-1">
-    <p>No: ${pokemon.pokeid}</p>
-    <p>Name: ${pokemon.pokeName}</p>
-    <p>Type: ${pokemon.pokeType}</p>
-    <button onclick="updateCard(${pokemon.id})" class="bg-green-700 text-white p-1 mt-1">
-    Update
-        </button>
+      <button data-id="${pokemon.id}"
+        class="update-btn bg-blue-500 w-full mt-3 p-1 rounded">
+        Edit
+      </button>
 
-        <button onclick="deleteCard(${pokemon.id})" class="bg-red-700 text-white p-1 mt-1">
+      <button data-id="${pokemon.id}"
+        class="delete-btn bg-red-500 w-full mt-1 p-1 rounded">
         Delete
-        </button>
-        </div>
+      </button>
+    </div>
+  `,
+    )
+    .join("");
 
-        
-        `;
-  });
-  
-
+  console.log("Hello", pokemonData);
 };
-
 
 const updateCard = (id) => {
-  id = Number(id);
-
   const pokemon = pokemonData.find((p) => p.id === id);
   if (!pokemon) return;
 
   editId = id;
-  createCard(pokemon);
+  pokemonForm(pokemon);
 };
 
 const deleteCard = (id) => {
-  pokemonData = pokemonData.filter((pokemon) => pokemon.id !== id);
-
+  pokemonData = pokemonData.filter((p) => p.id !== id);
   localStorage.setItem("pokemonData", JSON.stringify(pokemonData));
-  displayCard();
+  renderCards();
 };
 
 document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("update-btn")) {
+  if (e.target.matches(".update-btn")) {
     updateCard(Number(e.target.dataset.id));
   }
-  if (e.target.classList.contains("delete-btn")) {
+
+  if (e.target.matches(".delete-btn")) {
     deleteCard(Number(e.target.dataset.id));
   }
 });
 
 const closeForm = () => {
-  const display = document.getElementById("display-card");
-  display.style.display = "none";
-  // display.innerHTML = "";
-  displayCard();
+  formContainer.innerHTML = "";
 };
 
-displayCard();
+renderCards();
