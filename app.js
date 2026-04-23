@@ -1,4 +1,4 @@
-const pokemonData = JSON.parse(localStorage.getItem("pokemonData")) || [];
+let pokemonData = JSON.parse(localStorage.getItem("pokemonData")) || [];
 let editId = null;
 
 const formContainer = document.querySelector("#form-container");
@@ -190,6 +190,7 @@ const updateCard = (id) => {
 };
 
 const deleteCard = (id) => {
+  console.log("delete", id);
   pokemonData = pokemonData.filter((p) => p.id !== id);
   localStorage.setItem("pokemonData", JSON.stringify(pokemonData));
   renderCards();
